@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Build Your PC – India</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>
+tailwind.config = {
+  theme: {
+    extend: {
+      colors: {
+        brand: { 50:"#f0f4ff", 100:"#dde8ff", 500:"#3b67f7", 600:"#2a55e8", 700:"#1e45d2" },
+        surface: { DEFAULT:"#0f1117", card:"#181c27", border:"#252a3a" }
+      },
+      fontFamily: { sans: ["Inter","system-ui","sans-serif"] }
+    }
+  },
+  darkMode: "class"
+}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+  * { box-sizing: border-box; }
+  body { background:#0f1117; color:#e2e8f0; font-family:'Inter',sans-serif; min-height:100vh; }
+  .hide { display:none !important; }
+  ::-webkit-scrollbar { width:6px; } ::-webkit-scrollbar-track { background:#181c27; } ::-webkit-scrollbar-thumb { background:#3b67f7; border-radius:3px; }
+  .card-hover { transition: transform .18s, box-shadow .18s; }
+  .card-hover:hover { transform:translateY(-2px); box-shadow:0 8px 32px rgba(59,103,247,.18); }
+  .tab-active { background:#3b67f7; color:#fff; }
+  .tab-btn { transition: background .15s, color .15s; }
+  .compare-col { min-width:200px; max-width:260px; }
+  .badge { display:inline-flex; align-items:center; padding:2px 8px; border-radius:999px; font-size:.72rem; font-weight:600; letter-spacing:.03em; }
+  .warn-banner { background:rgba(251,191,36,.08); border:1px solid rgba(251,191,36,.35); border-radius:8px; padding:10px 14px; font-size:.85rem; color:#fbbf24; display:flex; gap:8px; align-items:flex-start; }
+  .warn-banner svg { flex-shrink:0; margin-top:1px; }
+  .chip { display:inline-block; background:#252a3a; border:1px solid #353b4f; padding:2px 9px; border-radius:6px; font-size:.78rem; margin:2px; }
+  .cart-qty { width:36px; text-align:center; background:#252a3a; border:1px solid #353b4f; color:#e2e8f0; border-radius:6px; padding:2px 4px; }
+  input[type=number]::-webkit-inner-spin-button { -webkit-appearance:none; }
+  /* compare highlight best */
+  .best-val { background:rgba(59,247,100,.08); border-radius:4px; }
+</style>
+</head>
+<body class="dark">
+
+<!-- ===== NAV ===== -->
+<nav class="sticky top-0 z-50 bg-surface/90 backdrop-blur border-b border-surface-border px-4 py-3 flex items-center gap-4">
+  <button onclick="goHome()" class="flex items-center gap-2 font-bold text-lg tracking-tight hover:text-brand-500 transition-colors">
+    <svg class="w-6 h-6 text-brand-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18"/></svg>
+    Build Your PC
+  </button>
+  <span class="text-surface-border">|</span>
+  <button onclick="showSection('builder')" class="tab-btn text-sm px-3 py-1 rounded-full hover:bg-surface-card" id="nav-builder">Builder</button>
+  <button onclick="showSection('gpus')" class="tab-btn text-sm px-3 py-1 rounded-full hover:bg-surface-card" id="nav-gpus">GPUs</button>
+  <button onclick="showSection('cpus')" class="tab-btn text-sm px-3 py-1 rounded-full hover:bg-surface-card" id="nav-cpus">CPUs</button>
+  <button onclick="showSection('ram')" class="tab-btn text-sm px-3 py-1 rounded-full hover:bg-surface-card" id="nav-ram">RAM</button>
+  <button onclick="showSection('ssds')" class="tab-btn text-sm px-3 py-1 rounded-full hover:bg-surface-card" id="nav-ssds">SSDs</button>
+  <div class="ml-auto flex items-center gap-2">
+    <button onclick="showSection('cart')" class="relative flex items-center gap-1.5 bg-brand-500 hover:bg-brand-600 text-white text-sm font-medium px-3 py-1.5 rounded-lg transition-colors">
+      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13l-1.4 7h12.8M7 13L5.4 5M17 21a1 1 0 100-2 1 1 0 000 2zM9 21a1 1 0 100-2 1 1 0 000 2z"/></svg>
+      Cart <span id="cart-badge" class="bg-white text-brand-600 text-xs font-bold px-1.5 py-0.5 rounded-full">0</span>
+    </button>
+  </div>
+</nav>
+
+<!-- ===== MAIN ===== -->
+<main class="max-w-7xl mx-auto px-4 py-6">
+
+<!-- HOME -->
+<section id="sec-home">
+  <div class="text-center py-14">
+    <h1 class="text-4xl md:text-5xl font-extrabold mb-3 bg-gradient-to-r from-brand-500 to-purple-400 bg-clip-text text-transparent">Build Your Dream PC</h1>
+    <p class="text-slate-400 text-lg mb-8 max-w-xl mx-auto">Pick components, check compatibility, and import your build directly to Amazon India.</p>
+    <button onclick="showSection('builder')" class="bg-brand-500 hover:bg-brand-600 text-white font-semibold px-8 py-3 rounded-xl text-lg transition-colors shadow-lg shadow-brand-500/30">Start Building</button>
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mt-4">
+    <div class="bg-surface-card border border-surface-border rounded-xl p-5 cursor-pointer card-hover" onclick="showSection('gpus')">
+      <div class="text-3xl mb-2">🖥️</div>
+      <h3 class="font-semibold text-base mb-1">Graphics Cards</h3>
+      <p class="text-slate-400 text-sm">RTX 50 Series – 9 cards</p>
+    </div>
+    <div class="bg-surface-card border border-surface-border rounded-xl p-5 cursor-pointer card-hover" onclick="showSection('cpus')">
+      <div class="text-3xl mb-2">⚡</div>
+      <h3 class="font-semibold text-base mb-1">Processors</h3>
+      <p class="text-slate-400 text-sm">Intel 13th/14th Gen + AMD Ryzen 9000 – 20 CPUs</p>
+    </div>
+    <div class="bg-surface-card border border-surface-border rounded-xl p-5 cursor-pointer card-hover" onclick="showSection('ram')">
+      <div class="text-3xl mb-2">💾</div>
+      <h3 class="font-semibold text-base mb-1">Memory</h3>
+      <p class="text-slate-400 text-sm">DDR4 &amp; DDR5 – 21 kits</p>
+    </div>
+    <div class="bg-surface-card border border-surface-border rounded-xl p-5 cursor-pointer card-hover" onclick="showSection('ssds')">
+      <div class="text-3xl mb-2">💿</div>
+      <h3 class="font-semibold text-base mb-1">Storage (SSD)</h3>
+      <p class="text-slate-400 text-sm">Samsung, WD, Crucial, Kingston – 21 drives</p>
+    </div>
+  </div>
+</section>
+
+<!-- PART LIST (GPU/CPU/RAM share this layout) -->
+<section id="sec-list" class="hide">
+  <div class="flex flex-wrap items-center gap-3 mb-5">
+    <button onclick="goBack()" class="text-slate-400 hover:text-white flex items-center gap-1 text-sm"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>Back</button>
+    <h2 id="list-title" class="text-xl font-bold"></h2>
+    <div class="ml-auto flex gap-2 flex-wrap">
+      <input id="list-search" type="text" placeholder="Search…" oninput="renderList()" class="bg-surface-card border border-surface-border rounded-lg px-3 py-1.5 text-sm w-44 focus:outline-none focus:border-brand-500"/>
+      <button id="compare-btn" onclick="showCompare()" class="bg-surface-card border border-surface-border hover:border-brand-500 text-sm px-3 py-1.5 rounded-lg transition-colors hide">Compare (<span id="compare-count">0</span>)</button>
+    </div>
+  </div>
+  <div id="list-filters" class="flex flex-wrap gap-2 mb-4"></div>
+  <div id="list-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+</section>
+
+<!-- COMPARE VIEW -->
+<section id="sec-compare" class="hide">
+  <div class="flex items-center gap-3 mb-5">
+    <button onclick="goBack()" class="text-slate-400 hover:text-white flex items-center gap-1 text-sm"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>Back</button>
+    <h2 id="compare-title" class="text-xl font-bold"></h2>
+  </div>
+  <div id="compare-table" class="overflow-x-auto"></div>
+</section>
+
+<!-- BUILDER -->
+<section id="sec-builder" class="hide">
+  <h2 class="text-xl font-bold mb-5">PC Builder</h2>
+  <div id="compat-warnings" class="space-y-2 mb-4"></div>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="builder-slots"></div>
+  <!-- Power meter -->
+  <div class="mt-5 bg-surface-card border border-surface-border rounded-xl p-4">
+    <div class="flex justify-between text-sm mb-2">
+      <span class="font-medium">Estimated Power Draw</span>
+      <span id="power-text" class="text-slate-400">0 W</span>
+    </div>
+    <div class="h-2 bg-surface-border rounded-full overflow-hidden">
+      <div id="power-bar" class="h-full rounded-full transition-all" style="width:0%;background:#3b67f7"></div>
+    </div>
+    <p class="text-xs text-slate-500 mt-1.5" id="power-note">Add a CPU and GPU to see estimated power draw.</p>
+  </div>
+</section>
+
+<!-- CART -->
+<section id="sec-cart" class="hide">
+  <div class="flex items-center gap-3 mb-5">
+    <button onclick="goBack()" class="text-slate-400 hover:text-white flex items-center gap-1 text-sm"><svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>Back</button>
+    <h2 class="text-xl font-bold">Your Cart</h2>
+  </div>
+  <div id="cart-items"></div>
+  <div id="cart-empty" class="text-center py-14 text-slate-400">
+    <div class="text-5xl mb-3">🛒</div>
+    <p>Your cart is empty. Add parts from the GPU, CPU or RAM pages.</p>
+  </div>
+  <div id="cart-footer" class="hide mt-4 bg-surface-card border border-surface-border rounded-xl p-4">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <div>
+        <p class="text-xs text-slate-500 mb-1">Prices shown are estimates. Always verify on Amazon before purchasing.</p>
+        <p class="text-xs text-slate-500">Clicking "Import to Amazon" opens amazon.in with your parts pre-added to the cart.</p>
+      </div>
+      <button onclick="importToAmazon()" class="bg-[#FF9900] hover:bg-[#e88a00] text-black font-bold px-6 py-2.5 rounded-lg flex items-center gap-2 transition-colors">
+        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM7.6 4L6 2H2v2h2l3.6 7.6L6.3 14c-.2.3-.3.6-.3 1 0 1.1.9 2 2 2h12v-2H8.5c-.1 0-.2-.1-.2-.2l.2-.8H19c.75 0 1.4-.4 1.75-1L23 7H6.2l-.6-3z"/></svg>
+        Import to Amazon Cart
+      </button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ===== MODAL ===== -->
+<div id="modal-overlay" class="hide fixed inset-0 z-50 bg-black/70 flex items-center justify-center p-4" onclick="closeModal(event)">
+  <div class="bg-surface-card border border-surface-border rounded-2xl p-6 w-full max-w-lg max-h-[90vh] overflow-y-auto" onclick="event.stopPropagation()">
+    <div class="flex items-start justify-between mb-4">
+      <h3 id="modal-title" class="text-lg font-bold pr-4"></h3>
+      <button onclick="closeModal()" class="text-slate-400 hover:text-white mt-0.5"><svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div id="modal-body"></div>
+  </div>
+</div>
+
+<!-- Data files -->
+<script src="data/gpus.js"></script>
+<script src="data/cpus.js"></script>
+<script src="data/ram.js"></script>
+<script src="data/ssds.js"></script>
+
+<script>
+// ===== STATE =====
+let currentSection = 'home';
+let prevSection = 'home';
+let currentCategory = null; // 'gpus' | 'cpus' | 'ram'
+let compareItems = new Set();
+let cart = {}; // asin -> {item, qty}
+let filterState = {};
+
+const BUILD = {
+  gpu: null,
+  cpu: null,
+  ram: null,
+  ssd: null
+};
+
+// ===== NAV =====
+function showSection(name) {
+  ['home','list','compare','builder','cart'].forEach(s => {
+    document.getElementById('sec-'+s).classList.add('hide');
+  });
+  ['builder','gpus','cpus','ram','ssds','cart'].forEach(n => {
+    document.getElementById('nav-'+n)?.classList.remove('tab-active');
+  });
+  if (name === 'gpus' || name === 'cpus' || name === 'ram' || name === 'ssds') {
+    prevSection = currentSection;
+    currentSection = name;
+    currentCategory = name;
+    compareItems.clear();
+    filterState = {};
+    document.getElementById('sec-list').classList.remove('hide');
+    initList(name);
+    document.getElementById('nav-'+name)?.classList.add('tab-active');
+  } else {
+    prevSection = currentSection;
+    currentSection = name;
+    document.getElementById('sec-'+name).classList.remove('hide');
+    if (name === 'builder') { renderBuilder(); document.getElementById('nav-builder').classList.add('tab-active'); }
+    if (name === 'cart') renderCart();
+    if (name === 'home') {}
+  }
+}
+
+function goHome() { showSection('home'); }
+
+function goBack() {
+  if (currentSection === 'compare') {
+    showSection(currentCategory);
+  } else {
+    showSection('home');
+  }
+}
+
+// ===== LIST =====
+const LIST_CONFIG = {
+  gpus: {
+    title: 'Graphics Cards (RTX 50 Series)',
+    data: () => gpus,
+    filters: [
+      { key:'model', label:'GPU', fn: (item, v) => item.model === v,
+        options: () => [...new Set(gpus.map(g=>g.model))] },
+      { key:'manufacturer', label:'Brand', fn: (item, v) => item.manufacturer === v,
+        options: () => [...new Set(gpus.map(g=>g.manufacturer))] }
+    ],
+    card: renderGpuCard,
+    specs: gpuSpecs
+  },
+  cpus: {
+    title: 'Processors',
+    data: () => cpus,
+    filters: [
+      { key:'manufacturer', label:'Brand', fn: (item, v) => item.manufacturer === v,
+        options: () => ['Intel','AMD'] },
+      { key:'socket', label:'Socket', fn: (item, v) => item.socket === v,
+        options: () => [...new Set(cpus.map(c=>c.socket))] },
+      { key:'memType', label:'Memory', fn: (item, v) => item.memorySupport.includes(v),
+        options: () => ['DDR4','DDR5'] }
+    ],
+    card: renderCpuCard,
+    specs: cpuSpecs
+  },
+  ram: {
+    title: 'Memory (RAM)',
+    data: () => ram,
+    filters: [
+      { key:'memoryType', label:'Type', fn: (item, v) => item.memoryType === v,
+        options: () => ['DDR5','DDR4'] },
+      { key:'manufacturer', label:'Brand', fn: (item, v) => item.manufacturer === v,
+        options: () => [...new Set(ram.map(r=>r.manufacturer))] },
+      { key:'rgb', label:'RGB', fn: (item, v) => v === 'Yes' ? item.rgb === true : item.rgb === false,
+        options: () => ['Yes','No'] }
+    ],
+    card: renderRamCard,
+    specs: ramSpecs
+  },
+  ssds: {
+    title: 'Storage (SSDs)',
+    data: () => ssds,
+    filters: [
+      { key:'manufacturer', label:'Brand', fn: (item, v) => item.manufacturer === v,
+        options: () => [...new Set(ssds.map(s=>s.manufacturer))] },
+      { key:'tier', label:'Tier', fn: (item, v) => item.tier === v,
+        options: () => ['Enthusiast','High-end','Mid-range','Budget'] },
+      { key:'capacity', label:'Capacity', fn: (item, v) => item.capacity === v,
+        options: () => [...new Set(ssds.map(s=>s.capacity))].sort() }
+    ],
+    card: renderSsdCard,
+    specs: ssdSpecs
+  }
+};
+
+function initList(cat) {
+  const cfg = LIST_CONFIG[cat];
+  document.getElementById('list-title').textContent = cfg.title;
+  document.getElementById('list-search').value = '';
+  renderFilters(cat);
+  renderList();
+}
+
+function renderFilters(cat) {
+  const cfg = LIST_CONFIG[cat];
+  const el = document.getElementById('list-filters');
+  el.innerHTML = '';
+  cfg.filters.forEach(f => {
+    f.options().forEach(opt => {
+      const active = filterState[f.key] === opt;
+      const btn = document.createElement('button');
+      btn.className = `chip cursor-pointer ${active ? 'border-brand-500 text-brand-500' : 'hover:border-slate-400'} transition-colors`;
+      btn.textContent = opt;
+      btn.onclick = () => {
+        if (filterState[f.key] === opt) delete filterState[f.key];
+        else filterState[f.key] = opt;
+        renderFilters(cat);
+        renderList();
+      };
+      el.appendChild(btn);
+    });
+    const sep = document.createElement('span');
+    sep.className = 'text-surface-border self-center mx-1';
+    sep.textContent = '|';
+    el.appendChild(sep);
+  });
+}
+
+function renderList() {
+  const cfg = LIST_CONFIG[currentCategory];
+  const q = document.getElementById('list-search').value.toLowerCase();
+  let items = cfg.data();
+
+  // Apply filters
+  Object.entries(filterState).forEach(([key, val]) => {
+    const f = cfg.filters.find(f => f.key === key);
+    if (f) items = items.filter(i => f.fn(i, val));
+  });
+
+  // Search
+  if (q) items = items.filter(i => JSON.stringify(i).toLowerCase().includes(q));
+
+  const grid = document.getElementById('list-grid');
+  grid.innerHTML = '';
+  if (items.length === 0) {
+    grid.innerHTML = '<p class="text-slate-400 col-span-3 text-center py-10">No results found.</p>';
+  } else {
+    items.forEach(item => {
+      grid.appendChild(cfg.card(item));
+    });
+  }
+
+  // Compare button
+  const btn = document.getElementById('compare-btn');
+  const cnt = compareItems.size;
+  document.getElementById('compare-count').textContent = cnt;
+  if (cnt >= 2) btn.classList.remove('hide'); else btn.classList.add('hide');
+}
+
+// ===== GPU CARD =====
+function renderGpuCard(g) {
+  const inCart = !!cart[g.asin];
+  const inBuild = BUILD.gpu?.id === g.id;
+  const inCompare = compareItems.has(g.id);
+  const div = document.createElement('div');
+  div.className = 'bg-surface-card border border-surface-border rounded-xl p-4 flex flex-col gap-3 card-hover';
+  div.innerHTML = `
+    <div class="flex items-start justify-between gap-2">
+      <div>
+        <div class="text-xs text-slate-500 mb-0.5">${g.manufacturer}</div>
+        <h3 class="font-semibold text-sm leading-tight">${g.model} ${g.variant}</h3>
+      </div>
+      ${imgOrPlaceholder(g.image)}
+    </div>
+    <div class="grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-slate-400">
+      <span>VRAM</span><span class="text-white font-medium">${g.vram} GB ${g.vramType}</span>
+      <span>CUDA Cores</span><span class="text-white font-medium">${g.cudaCores.toLocaleString()}</span>
+      <span>Boost Clock</span><span class="text-white font-medium">${g.boostClock} MHz</span>
+      <span>TGP</span><span class="text-white font-medium">${g.tgp} W</span>
+      <span>Bus</span><span class="text-white font-medium">${g.memoryBus}</span>
+      <span>PSU (min)</span><span class="text-white font-medium">${g.recommendedPsu} W</span>
+    </div>
+    <div class="flex flex-wrap gap-1.5 mt-auto pt-1">
+      <span class="badge ${g.asinStatus.startsWith('Verified') ? 'bg-green-500/10 text-green-400' : 'bg-yellow-500/10 text-yellow-400'}">${g.asinStatus.startsWith('Verified') ? 'Verified' : 'Unverified'}</span>
+    </div>
+    ${priceWidget(g.asin)}
+    <div class="flex gap-2 pt-1">
+      <button onclick="addToBuild('gpu','${g.id}')" class="flex-1 text-xs py-1.5 rounded-lg border transition-colors ${inBuild ? 'bg-brand-500 border-brand-500 text-white' : 'border-surface-border hover:border-brand-500 text-slate-300'}">
+        ${inBuild ? '✓ In Build' : '+ Add to Build'}
+      </button>
+      <button onclick="toggleCart('${g.asin}','gpu')" class="flex-1 text-xs py-1.5 rounded-lg border transition-colors ${inCart ? 'bg-orange-500/20 border-orange-500 text-orange-400' : 'border-surface-border hover:border-orange-500 text-slate-300'}">
+        ${inCart ? '✓ In Cart' : '🛒 Cart'}
+      </button>
+      <button onclick="toggleCompare('${g.id}')" class="text-xs py-1.5 px-3 rounded-lg border transition-colors ${inCompare ? 'bg-purple-500/20 border-purple-500 text-purple-400' : 'border-surface-border hover:border-purple-500 text-slate-300'}">
+        Compare
+      </button>
+    </div>
+  `;
+  return div;
+}
+
+// ===== CPU CARD =====
+function renderCpuCard(c) {
+  const inCart = !!cart[c.asin];
+  const inBuild = BUILD.cpu?.id === c.id;
+  const inCompare = compareItems.has(c.id);
+  const div = document.createElement('div');
+  div.className = 'bg-surface-card border border-surface-border rounded-xl p-4 flex flex-col gap-3 card-hover';
+  div.innerHTML = `
+    <div class="flex items-start justify-between gap-2">
+      <div>
+        <div class="text-xs text-slate-500 mb-0.5">${c.manufacturer} · ${c.series}</div>
+        <h3 class="font-semibold text-sm leading-tight">${c.model}</h3>
+      </div>
+      ${imgOrPlaceholder(c.image)}
+    </div>
+    <div class="grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-slate-400">
+      <span>Cores/Threads</span><span class="text-white font-medium">${c.cores}C / ${c.threads}T</span>
+      <span>Boost Clock</span><span class="text-white font-medium">${c.boostSpeed} GHz</span>
+      <span>Socket</span><span class="text-white font-medium">${c.socket}</span>
+      <span>Max Power</span><span class="text-white font-medium">${c.maxPower} W</span>
+      <span>Memory</span><span class="text-white font-medium">${c.memorySupport.join(' / ')}</span>
+      <span>iGPU</span><span class="text-white font-medium">${c.integratedGraphics ? '✓' : '—'}</span>
+    </div>
+    <div class="flex flex-wrap gap-1.5 mt-auto pt-1">
+      <span class="badge bg-blue-500/10 text-blue-400">${c.socket}</span>
+      ${c.architecture.includes('3D') ? '<span class="badge bg-purple-500/10 text-purple-400">3D V-Cache</span>' : ''}
+    </div>
+    <div class="flex gap-2 pt-1">
+      <button onclick="addToBuild('cpu','${c.id}')" class="flex-1 text-xs py-1.5 rounded-lg border transition-colors ${inBuild ? 'bg-brand-500 border-brand-500 text-white' : 'border-surface-border hover:border-brand-500 text-slate-300'}">
+        ${inBuild ? '✓ In Build' : '+ Add to Build'}
+      </button>
+      <button onclick="toggleCart('${c.id}','cpu')" class="flex-1 text-xs py-1.5 rounded-lg border transition-colors ${inCart ? 'bg-orange-500/20 border-orange-500 text-orange-400' : 'border-surface-border hover:border-orange-500 text-slate-300'}">
+        ${inCart ? '✓ In Cart' : '🛒 Cart'}
+      </button>
+      <button onclick="toggleCompare('${c.id}')" class="text-xs py-1.5 px-3 rounded-lg border transition-colors ${inCompare ? 'bg-purple-500/20 border-purple-500 text-purple-400' : 'border-surface-border hover:border-purple-500 text-slate-300'}">
+        Compare
+      </button>
+    </div>
+  `;
+  return div;
+}
+
+// ===== RAM CARD =====
+function renderRamCard(r) {
+  const inCart = !!cart[r.asin];
+  const inBuild = BUILD.ram?.id === r.id;
+  const inCompare = compareItems.has(r.id);
+  const div = document.createElement('div');
+  div.className = 'bg-surface-card border border-surface-border rounded-xl p-4 flex flex-col gap-3 card-hover';
+  div.innerHTML = `
+    <div class="flex items-start justify-between gap-2">
+      <div>
+        <div class="text-xs text-slate-500 mb-0.5">${r.manufacturer}</div>
+        <h3 class="font-semibold text-sm leading-tight">${r.productLine}</h3>
+      </div>
+      ${imgOrPlaceholder(r.image)}
+    </div>
+    <div class="grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-slate-400">
+      <span>Type</span><span class="text-white font-medium">${r.memoryType}</span>
+      <span>Speed</span><span class="text-white font-medium">${r.speed} MT/s</span>
+      <span>CAS Latency</span><span class="text-white font-medium">CL${r.casLatency}</span>
+      <span>1st-Word Lat.</span><span class="text-white font-medium">${r.firstWordLatency} ns</span>
+      <span>Capacity</span><span class="text-white font-medium">${r.stickCapacity} GB</span>
+      <span>Profile</span><span class="text-white font-medium">${r.profileSupport}</span>
+    </div>
+    <div class="flex flex-wrap gap-1.5 mt-auto pt-1">
+      <span class="badge ${r.memoryType === 'DDR5' ? 'bg-brand-500/10 text-brand-500' : 'bg-slate-500/20 text-slate-400'}">${r.memoryType}</span>
+      ${r.rgb === true ? '<span class="badge bg-pink-500/10 text-pink-400">RGB</span>' : ''}
+      ${r.profileSupport.includes('EXPO') ? '<span class="badge bg-red-500/10 text-red-400">EXPO</span>' : ''}
+    </div>
+    <div class="flex gap-2 pt-1">
+      <button onclick="addToBuild('ram','${r.id}')" class="flex-1 text-xs py-1.5 rounded-lg border transition-colors ${inBuild ? 'bg-brand-500 border-brand-500 text-white' : 'border-surface-border hover:border-brand-500 text-slate-300'}">
+        ${inBuild ? '✓ In Build' : '+ Add to Build'}
+      </button>
+      <button onclick="toggleCart('${r.id}','ram')" class="flex-1 text-xs py-1.5 rounded-lg border transition-colors ${inCart ? 'bg-orange-500/20 border-orange-500 text-orange-400' : 'border-surface-border hover:border-orange-500 text-slate-300'}">
+        ${inCart ? '✓ In Cart' : '🛒 Cart'}
+      </button>
+      <button onclick="toggleCompare('${r.id}')" class="text-xs py-1.5 px-3 rounded-lg border transition-colors ${inCompare ? 'bg-purple-500/20 border-purple-500 text-purple-400' : 'border-surface-border hover:border-purple-500 text-slate-300'}">
+        Compare
+      </button>
+    </div>
+  `;
+  return div;
+}
+
+// ===== SSD CARD =====
+function renderSsdCard(s) {
+  const inCart = s.asin ? !!cart[s.asin] : false;
+  const inBuild = BUILD.ssd?.id === s.id;
+  const inCompare = compareItems.has(s.id);
+  const noAsin = !s.asin;
+  const tierColor = s.tier === 'Enthusiast' ? 'bg-purple-500/10 text-purple-400' :
+                    s.tier === 'High-end'    ? 'bg-brand-500/10 text-brand-500' :
+                    s.tier === 'Mid-range'   ? 'bg-green-500/10 text-green-400' :
+                                               'bg-slate-500/20 text-slate-400';
+  const div = document.createElement('div');
+  div.className = 'bg-surface-card border border-surface-border rounded-xl p-4 flex flex-col gap-3 card-hover';
+  div.innerHTML = `
+    <div class="flex items-start justify-between gap-2">
+      <div>
+        <div class="text-xs text-slate-500 mb-0.5">${s.manufacturer}</div>
+        <h3 class="font-semibold text-sm leading-tight">${s.model} ${s.capacity}</h3>
+      </div>
+      ${imgOrPlaceholder(s.image)}
+    </div>
+    <div class="grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-slate-400">
+      <span>Interface</span><span class="text-white font-medium">${s.interface}</span>
+      <span>Read</span><span class="text-white font-medium">${s.readSpeed.toLocaleString()} MB/s</span>
+      <span>Write</span><span class="text-white font-medium">${s.writeSpeed.toLocaleString()} MB/s</span>
+      <span>Form Factor</span><span class="text-white font-medium">${s.formFactor}</span>
+    </div>
+    <div class="flex flex-wrap gap-1.5 mt-auto pt-1">
+      <span class="badge ${tierColor}">${s.tier}</span>
+      ${noAsin ? '<span class="badge bg-yellow-500/10 text-yellow-400">ASIN needed</span>' : '<span class="badge bg-green-500/10 text-green-400">Has ASIN</span>'}
+    </div>
+    ${noAsin ? '<p class="text-xs text-yellow-500/70">Add ASIN in data/ssds.js to enable cart & price.</p>' : priceWidget(s.asin)}
+    <div class="flex gap-2 pt-1">
+      <button onclick="addToBuild('ssd','${s.id}')" class="flex-1 text-xs py-1.5 rounded-lg border transition-colors ${inBuild ? 'bg-brand-500 border-brand-500 text-white' : 'border-surface-border hover:border-brand-500 text-slate-300'}">
+        ${inBuild ? '✓ In Build' : '+ Add to Build'}
+      </button>
+      <button onclick="toggleCart('${s.asin}','ssd')" class="flex-1 text-xs py-1.5 rounded-lg border transition-colors ${inCart ? 'bg-orange-500/20 border-orange-500 text-orange-400' : noAsin ? 'border-surface-border text-slate-600 cursor-not-allowed' : 'border-surface-border hover:border-orange-500 text-slate-300'}" ${noAsin ? 'disabled' : ''}>
+        ${inCart ? '✓ In Cart' : '🛒 Cart'}
+      </button>
+      <button onclick="toggleCompare('${s.id}')" class="text-xs py-1.5 px-3 rounded-lg border transition-colors ${inCompare ? 'bg-purple-500/20 border-purple-500 text-purple-400' : 'border-surface-border hover:border-purple-500 text-slate-300'}">
+        Compare
+      </button>
+    </div>
+  `;
+  return div;
+}
+
+function imgOrPlaceholder(url) {
+  if (url) return `<img src="${url}" class="w-14 h-14 object-contain rounded-lg bg-surface-border" alt=""/>`;
+  return `<div class="w-14 h-14 flex items-center justify-center rounded-lg bg-surface-border text-slate-500 text-xs text-center leading-tight" style="min-width:56px">No image</div>`;
+}
+
+// ===== COMPARE =====
+function toggleCompare(id) {
+  if (compareItems.has(id)) compareItems.delete(id);
+  else {
+    if (compareItems.size >= 4) { alert('Compare up to 4 items at a time.'); return; }
+    compareItems.add(id);
+  }
+  renderList();
+}
+
+function showCompare() {
+  prevSection = currentCategory;
+  currentSection = 'compare';
+  document.getElementById('sec-list').classList.add('hide');
+  document.getElementById('sec-compare').classList.remove('hide');
+  const cfg = LIST_CONFIG[currentCategory];
+  const catLabel = {gpus:'GPUs', cpus:'CPUs', ram:'RAM', ssds:'SSDs'};
+  document.getElementById('compare-title').textContent = 'Compare ' + (catLabel[currentCategory] || currentCategory);
+  const items = cfg.data().filter(i => compareItems.has(i.id));
+  renderCompareTable(items, cfg.specs);
+}
+
+function gpuSpecs(items) {
+  const rows = [
+    { label:'Model', fn: g => `${g.model}` },
+    { label:'Manufacturer', fn: g => g.manufacturer },
+    { label:'Variant', fn: g => g.variant },
+    { label:'Architecture', fn: g => g.architecture },
+    { label:'CUDA Cores', fn: g => g.cudaCores.toLocaleString(), best:'max', num: g => g.cudaCores },
+    { label:'RT Cores', fn: g => g.rtCores, best:'max', num: g => g.rtCores },
+    { label:'VRAM', fn: g => `${g.vram} GB ${g.vramType}`, best:'max', num: g => g.vram },
+    { label:'Memory Bus', fn: g => g.memoryBus },
+    { label:'Boost Clock', fn: g => `${g.boostClock} MHz`, best:'max', num: g => g.boostClock },
+    { label:'TGP', fn: g => `${g.tgp} W`, best:'min', num: g => g.tgp },
+    { label:'Rec. PSU', fn: g => `${g.recommendedPsu} W`, best:'min', num: g => g.recommendedPsu },
+    { label:'Card Length', fn: g => g.cardLength ? `${g.cardLength} mm` : '—' },
+    { label:'Power Connector', fn: g => g.powerConnector || '—' },
+    { label:'ASIN', fn: g => `<a href="https://www.amazon.in/dp/${g.asin}" target="_blank" class="text-brand-500 hover:underline text-xs">${g.asin}</a>` }
+  ];
+  return rows;
+}
+
+function cpuSpecs(items) {
+  return [
+    { label:'Model', fn: c => c.model },
+    { label:'Series', fn: c => c.series },
+    { label:'Socket', fn: c => c.socket },
+    { label:'Architecture', fn: c => c.architecture },
+    { label:'Cores', fn: c => c.cores, best:'max', num: c => c.cores },
+    { label:'Threads', fn: c => c.threads, best:'max', num: c => c.threads },
+    { label:'P-Cores', fn: c => c.manufacturer === 'Intel' ? c.pCores : c.cores },
+    { label:'E-Cores', fn: c => c.manufacturer === 'Intel' ? c.eCores : '—' },
+    { label:'Base Clock', fn: c => `${c.baseSpeed} GHz` },
+    { label:'Boost Clock', fn: c => `${c.boostSpeed} GHz`, best:'max', num: c => c.boostSpeed },
+    { label:'TDP', fn: c => `${c.tdp} W` },
+    { label:'Max Power', fn: c => `${c.maxPower} W`, best:'min', num: c => c.maxPower },
+    { label:'Memory Support', fn: c => c.memorySupport.join(' / ') },
+    { label:'Integrated Graphics', fn: c => c.integratedGraphics ? (c.igpuModel || '✓') : '—' },
+    { label:'ASIN', fn: c => `<a href="https://www.amazon.in/dp/${c.asin}" target="_blank" class="text-brand-500 hover:underline text-xs">${c.asin}</a>` }
+  ];
+}
+
+function ramSpecs(items) {
+  return [
+    { label:'Product Line', fn: r => r.productLine },
+    { label:'Manufacturer', fn: r => r.manufacturer },
+    { label:'Memory Type', fn: r => r.memoryType },
+    { label:'Speed', fn: r => `${r.speed} MT/s`, best:'max', num: r => r.speed },
+    { label:'CAS Latency', fn: r => `CL${r.casLatency}`, best:'min', num: r => r.casLatency },
+    { label:'1st-Word Latency', fn: r => `${r.firstWordLatency} ns`, best:'min', num: r => r.firstWordLatency },
+    { label:'Capacity (per stick)', fn: r => `${r.stickCapacity} GB` },
+    { label:'Profile', fn: r => r.profileSupport },
+    { label:'Form Factor', fn: r => r.formFactor },
+    { label:'RGB', fn: r => r.rgb === true ? '✓' : r.rgb === false ? '—' : 'Varies' },
+    { label:'Use Case', fn: r => r.useCase },
+    { label:'ASIN', fn: r => `<a href="https://www.amazon.in/dp/${r.asin}" target="_blank" class="text-brand-500 hover:underline text-xs">${r.asin}</a>` }
+  ];
+}
+
+function ssdSpecs(items) {
+  return [
+    { label:'Model', fn: s => s.model },
+    { label:'Manufacturer', fn: s => s.manufacturer },
+    { label:'Capacity', fn: s => s.capacity },
+    { label:'Interface', fn: s => s.interface },
+    { label:'Seq. Read', fn: s => `${s.readSpeed.toLocaleString()} MB/s`, best:'max', num: s => s.readSpeed },
+    { label:'Seq. Write', fn: s => `${s.writeSpeed.toLocaleString()} MB/s`, best:'max', num: s => s.writeSpeed },
+    { label:'Form Factor', fn: s => s.formFactor },
+    { label:'Tier', fn: s => s.tier },
+    { label:'ASIN', fn: s => s.asin ? `<a href="https://www.amazon.in/dp/${s.asin}" target="_blank" class="text-brand-500 hover:underline text-xs">${s.asin}</a>` : '<span class="text-yellow-400 text-xs">Not set</span>' }
+  ];
+}
+
+function renderCompareTable(items, specsFn) {
+  const rows = specsFn(items);
+  let html = `<table class="w-full border-collapse text-sm">
+    <thead><tr>
+      <th class="text-left text-slate-400 font-medium py-2 pr-4 sticky left-0 bg-surface" style="min-width:130px">Spec</th>
+      ${items.map(i => `<th class="compare-col text-left px-3 py-2 font-semibold">${i.model || i.productLine || i.name || ''}<br><span class="text-xs font-normal text-slate-400">${i.manufacturer || ''} ${i.variant || ''}</span></th>`).join('')}
+    </tr></thead>
+    <tbody>`;
+
+  rows.forEach((row, ri) => {
+    // Find best value if applicable
+    let bestIdx = -1;
+    if (row.best && row.num) {
+      const nums = items.map(row.num);
+      const extreme = row.best === 'max' ? Math.max(...nums) : Math.min(...nums);
+      if (nums.filter(n => n === extreme).length === 1) bestIdx = nums.indexOf(extreme);
+    }
+    html += `<tr class="${ri % 2 === 0 ? 'bg-surface/40' : ''}">
+      <td class="py-2 pr-4 text-slate-400 sticky left-0 bg-inherit">${row.label}</td>
+      ${items.map((item, ci) => {
+        const val = row.fn(item);
+        const highlight = bestIdx === ci ? ' best-val' : '';
+        return `<td class="compare-col px-3 py-2 text-white${highlight}">${val}</td>`;
+      }).join('')}
+    </tr>`;
+  });
+  html += `</tbody></table>`;
+
+  // Add to cart row
+  html += `<div class="flex gap-3 mt-4 overflow-x-auto">
+    <div style="min-width:130px"></div>
+    ${items.map(i => `<div class="compare-col px-3 flex flex-col gap-2">
+      <button onclick="toggleCart('${i.asin}','${currentCategory.slice(0,-1)}')" class="w-full text-xs py-1.5 rounded-lg border transition-colors ${cart[i.asin] ? 'bg-orange-500/20 border-orange-500 text-orange-400' : 'border-surface-border hover:border-orange-500 text-slate-300'}">
+        ${cart[i.asin] ? '✓ In Cart' : '🛒 Add to Cart'}
+      </button>
+    </div>`).join('')}
+  </div>`;
+
+  document.getElementById('compare-table').innerHTML = html;
+}
+
+// ===== BUILD =====
+const SLOTS = [
+  { key:'gpu', label:'GPU', icon:'🖥️', category:'gpus' },
+  { key:'cpu', label:'CPU', icon:'⚡', category:'cpus' },
+  { key:'ram', label:'RAM', icon:'💾', category:'ram' },
+  { key:'ssd', label:'SSD', icon:'💿', category:'ssds' }
+];
+
+function addToBuild(type, id) {
+  const data = { gpu: gpus, cpu: cpus, ram: ram, ssd: ssds };
+  const list = data[type];
+  const item = list.find(i => i.id === id);
+  if (!item) return;
+  BUILD[type] = item;
+  checkCompatibility();
+  if (['gpus','cpus','ram','ssds'].includes(currentSection)) renderList();
+  // Show quick feedback
+  const toast = document.createElement('div');
+  toast.className = 'fixed bottom-6 left-1/2 -translate-x-1/2 bg-brand-500 text-white text-sm font-medium px-5 py-2.5 rounded-xl shadow-xl z-50';
+  toast.textContent = `Added ${item.model || item.productLine} to build`;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 2000);
+}
+
+function renderBuilder() {
+  const el = document.getElementById('builder-slots');
+  el.innerHTML = '';
+  SLOTS.forEach(slot => {
+    const item = BUILD[slot.key];
+    const div = document.createElement('div');
+    div.className = 'bg-surface-card border border-surface-border rounded-xl p-4';
+    div.innerHTML = `
+      <div class="flex items-center justify-between mb-3">
+        <div class="flex items-center gap-2 font-semibold">${slot.icon} ${slot.label}</div>
+        <button onclick="showSection('${slot.category}')" class="text-xs text-brand-500 hover:underline">
+          ${item ? 'Change' : 'Choose'}
+        </button>
+      </div>
+      ${item ? `
+        <div class="flex items-center gap-3">
+          ${imgOrPlaceholder(item.image)}
+          <div>
+            <div class="font-medium text-sm">${item.model || item.productLine}</div>
+            <div class="text-xs text-slate-400">${item.manufacturer} ${item.variant || ''}</div>
+            <div class="text-xs text-slate-500 mt-0.5">${getItemSummary(slot.key, item)}</div>
+          </div>
+          <button onclick="removeFromBuild('${slot.key}')" class="ml-auto text-slate-500 hover:text-red-400 text-lg leading-none">×</button>
+        </div>
+        <button onclick="toggleCart('${item.asin}','${slot.key}')" class="mt-3 w-full text-xs py-1.5 rounded-lg border transition-colors ${cart[item.asin] ? 'bg-orange-500/20 border-orange-500 text-orange-400' : 'border-surface-border hover:border-orange-500 text-slate-300'}">
+          ${cart[item.asin] ? '✓ In Cart' : '🛒 Add to Cart'}
+        </button>
+      ` : `<div class="text-sm text-slate-500">No ${slot.label} selected. <button onclick="showSection('${slot.category}')" class="text-brand-500 hover:underline">Browse →</button></div>`}
+    `;
+    el.appendChild(div);
+  });
+  updatePowerMeter();
+  checkCompatibility();
+}
+
+function getItemSummary(type, item) {
+  if (type === 'gpu') return `${item.vram} GB ${item.vramType} · ${item.tgp} W`;
+  if (type === 'cpu') return `${item.cores}C/${item.threads}T · ${item.boostSpeed} GHz · ${item.socket}`;
+  if (type === 'ram') return `${item.stickCapacity} GB ${item.memoryType} · ${item.speed} MT/s`;
+  if (type === 'ssd') return `${item.capacity} · ${item.readSpeed.toLocaleString()} MB/s read`;
+  return '';
+}
+
+function removeFromBuild(type) {
+  BUILD[type] = null;
+  renderBuilder();
+}
+
+function updatePowerMeter() {
+  const cpu = BUILD.cpu?.maxPower || 0;
+  const gpu = BUILD.gpu?.tgp || 0;
+  const system = 50; // motherboard + fans etc.
+  const total = cpu + gpu + system;
+  const pct = Math.min(100, Math.round(total / 10)); // 1000W = 100%
+  const bar = document.getElementById('power-bar');
+  const txt = document.getElementById('power-text');
+  const note = document.getElementById('power-note');
+  bar.style.width = pct + '%';
+  bar.style.background = pct > 80 ? '#ef4444' : pct > 60 ? '#f59e0b' : '#3b67f7';
+  if (total > 50) {
+    txt.textContent = `~${total} W (CPU ${cpu} W + GPU ${gpu} W + ~${system} W system)`;
+    const recPsu = Math.ceil((total * 1.3) / 50) * 50;
+    note.textContent = `Recommended PSU: at least ${recPsu} W (30% headroom). Minimum: ${total} W.`;
+  } else {
+    txt.textContent = '0 W';
+    note.textContent = 'Add a CPU and GPU to see estimated power draw.';
+  }
+}
+
+// ===== COMPATIBILITY =====
+function checkCompatibility() {
+  const warnings = [];
+  const cpu = BUILD.cpu;
+  const ram = BUILD.ram;
+
+  // CPU socket vs RAM type
+  if (cpu && ram) {
+    if (cpu.socket === 'AM5' && ram.memoryType === 'DDR4') {
+      warnings.push({ level:'error', msg: `Socket mismatch: ${cpu.model} (AM5) only supports DDR5, but ${ram.productLine} is DDR4.` });
+    }
+    if (!cpu.memorySupport.includes(ram.memoryType)) {
+      warnings.push({ level:'error', msg: `Memory type mismatch: ${cpu.model} does not support ${ram.memoryType}.` });
+    }
+  }
+
+  // GPU power
+  if (BUILD.gpu && BUILD.cpu) {
+    const total = BUILD.cpu.maxPower + BUILD.gpu.tgp + 50;
+    const recPsu = Math.ceil((total * 1.3) / 50) * 50;
+    if (recPsu > 850) {
+      warnings.push({ level:'warn', msg: `High power build: estimated ${total} W draw. Use a ${recPsu} W or higher PSU.` });
+    }
+  }
+
+  const el = document.getElementById('compat-warnings');
+  if (el) {
+    el.innerHTML = warnings.map(w => `
+      <div class="warn-banner ${w.level === 'error' ? 'border-red-500/40 bg-red-500/5 text-red-400' : ''}">
+        <svg class="w-4 h-4 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/></svg>
+        ${w.msg}
+      </div>
+    `).join('');
+  }
+}
+
+// ===== CART =====
+function toggleCart(asin, category) {
+  if (cart[asin]) {
+    delete cart[asin];
+  } else {
+    // Find item
+    if (!asin) return; // no ASIN means can't add to cart
+    const all = [...gpus, ...cpus, ...ram, ...ssds];
+    const item = all.find(i => i.asin === asin);
+    if (item) cart[asin] = { item, qty: 1, category };
+  }
+  updateCartBadge();
+  // Re-render current view
+  if (['gpus','cpus','ram','ssds'].includes(currentSection)) renderList();
+  if (currentSection === 'builder') renderBuilder();
+  if (currentSection === 'compare') showCompare();
+  if (currentSection === 'cart') renderCart();
+}
+
+function updateCartBadge() {
+  document.getElementById('cart-badge').textContent = Object.keys(cart).length;
+}
+
+function renderCart() {
+  const keys = Object.keys(cart);
+  const empty = document.getElementById('cart-empty');
+  const footer = document.getElementById('cart-footer');
+  const el = document.getElementById('cart-items');
+
+  if (keys.length === 0) {
+    empty.classList.remove('hide');
+    footer.classList.add('hide');
+    el.innerHTML = '';
+    return;
+  }
+  empty.classList.add('hide');
+  footer.classList.remove('hide');
+  el.innerHTML = keys.map(asin => {
+    const { item, qty, category } = cart[asin];
+    const name = item.model || item.productLine;
+    return `
+      <div class="bg-surface-card border border-surface-border rounded-xl p-4 flex items-center gap-4 mb-3">
+        ${imgOrPlaceholder(item.image)}
+        <div class="flex-1 min-w-0">
+          <div class="font-medium text-sm truncate">${name}</div>
+          <div class="text-xs text-slate-400">${item.manufacturer} ${item.variant || ''}</div>
+          <div class="text-xs text-slate-500 mt-0.5">ASIN: <a href="https://www.amazon.in/dp/${asin}" target="_blank" class="text-brand-500 hover:underline">${asin}</a></div>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="changeQty('${asin}',-1)" class="w-7 h-7 rounded-lg bg-surface-border hover:bg-slate-700 font-bold text-center">−</button>
+          <input type="number" value="${qty}" min="1" max="10" class="cart-qty" onchange="setQty('${asin}',this.value)"/>
+          <button onclick="changeQty('${asin}',1)" class="w-7 h-7 rounded-lg bg-surface-border hover:bg-slate-700 font-bold text-center">+</button>
+        </div>
+        <button onclick="toggleCart('${asin}','${category}')" class="text-slate-500 hover:text-red-400 ml-2 text-xl leading-none">×</button>
+      </div>`;
+  }).join('');
+}
+
+function changeQty(asin, delta) {
+  if (!cart[asin]) return;
+  cart[asin].qty = Math.max(1, Math.min(10, cart[asin].qty + delta));
+  renderCart();
+}
+
+function setQty(asin, val) {
+  if (!cart[asin]) return;
+  cart[asin].qty = Math.max(1, Math.min(10, parseInt(val) || 1));
+}
+
+// ===== AMAZON CART IMPORT =====
+function importToAmazon() {
+  const items = Object.values(cart).filter(({ item }) => item.asin); // skip items with no ASIN
+  if (items.length === 0) {
+    alert('No items with valid ASINs in your cart. Please add ASINs in data/ssds.js first.');
+    return;
+  }
+  // Amazon India multi-item cart URL
+  // Format: AssociateTag is optional; omitting it still works on amazon.in
+  // Each item pair: AssociateTag, ASIN.N, Quantity.N
+  const params = new URLSearchParams();
+  params.set('AssociateTag', 'buildurpc-21'); // change to your actual tag, or remove
+  items.forEach(({ item, qty }, i) => {
+    params.set(`ASIN.${i+1}`, item.asin);
+    params.set(`Quantity.${i+1}`, String(qty));
+  });
+  const url = `https://www.amazon.in/gp/aws/cart/add.html?${params.toString()}`;
+  window.open(url, '_blank');
+}
+
+// ===== PRICE FETCHING =====
+// prices[asin] = { price: 129999, checkedAt: "2026-10-18T...", loading: false, unavailable: false }
+const prices = {};
+
+async function fetchPrice(asin) {
+  if (prices[asin]?.loading) return;
+  // Don't re-fetch if checked within 6 hours
+  if (prices[asin]?.checkedAt) {
+    const age = Date.now() - new Date(prices[asin].checkedAt).getTime();
+    if (age < 6 * 60 * 60 * 1000) return;
+  }
+  prices[asin] = { ...prices[asin], loading: true };
+  updatePriceEls(asin);
+  try {
+    const res = await fetch(`/api/price?asin=${asin}`);
+    const data = await res.json();
+    if (data.price) {
+      prices[asin] = { price: data.price, checkedAt: data.checkedAt, loading: false };
+    } else if (data.unavailable) {
+      prices[asin] = { price: null, unavailable: true, checkedAt: data.checkedAt, loading: false };
+    } else {
+      prices[asin] = { price: null, error: data.error || 'unavailable', loading: false };
+    }
+  } catch(e) {
+    prices[asin] = { price: null, error: 'fetch failed', loading: false };
+  }
+  updatePriceEls(asin);
+}
+
+function updatePriceEls(asin) {
+  document.querySelectorAll(`[data-price-asin="${asin}"]`).forEach(el => {
+    el.innerHTML = priceHtml(asin);
+  });
+}
+
+function priceHtml(asin) {
+  const p = prices[asin];
+  if (!p || p.loading) return `<span class="text-slate-500 text-xs animate-pulse">Fetching price…</span>`;
+  if (p.unavailable) return `<span class="text-slate-500 text-xs">Currently unavailable</span>`;
+  if (p.error) return `<span class="text-slate-500 text-xs">Price unavailable</span>`;
+  if (p.price) {
+    const d = new Date(p.checkedAt);
+    const dateStr = d.toLocaleDateString('en-IN', { day:'numeric', month:'short', year:'numeric' });
+    return `<span class="text-green-400 font-semibold">₹${p.price.toLocaleString('en-IN')}</span><span class="text-slate-500 text-xs ml-1.5">checked ${dateStr}</span>`;
+  }
+  return `<span class="text-slate-500 text-xs">Price unavailable</span>`;
+}
+
+function priceWidget(asin) {
+  // Returns HTML for a price display + fetch button
+  return `<div class="flex items-center gap-2 mt-1">
+    <span data-price-asin="${asin}">${priceHtml(asin)}</span>
+    <button onclick="fetchPrice('${asin}')" title="Refresh price" class="text-slate-600 hover:text-brand-500 transition-colors">
+      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+    </button>
+  </div>`;
+}
+
+// ===== MODAL (for part detail — optional) =====
+function closeModal(e) {
+  document.getElementById('modal-overlay').classList.add('hide');
+}
+
+// ===== INIT =====
+showSection('home');
+</script>
+</body>
+</html>

@@ -1,0 +1,97 @@
+# Build Your PC – Web
+
+Zero-dependency static site. No build step. Works in any browser.
+
+## Structure
+
+```
+web/
+  index.html        ← entire site (one file, no framework needed)
+  vercel.json       ← SPA + API routing rules
+  data/
+    gpus.js         ← 9 RTX 50-series GPUs
+    cpus.js         ← 20 CPUs (Intel 13/14th Gen + AMD Ryzen 9000/8000)
+    ram.js          ← 21 RAM kits (DDR4 + DDR5)
+    ssds.js         ← 21 SSDs (Samsung, WD, Crucial, Kingston) — ASINs need filling
+  api/
+    price.js        ← Vercel serverless function; calls ScrapingAnt to get live price
+```
+
+## Run locally
+
+Just open `index.html` in a browser. Or:
+
+```bash
+npx serve .
+# then open http://localhost:3000
+```
+
+## Deploy to Vercel (free)
+
+1. Push this `web/` folder to GitHub.
+2. Go to vercel.com → New Project → import your repo.
+3. Set root directory to `web` (or leave blank if you push the whole repo).
+4. Framework preset: **Other** (or Static).
+5. Deploy. Vercel gives you a free `.vercel.app` domain.
+6. Later: add your Hostinger domain in Vercel's domain settings and update DNS.
+
+## Prices (ScrapingAnt)
+
+Price fetching is wired up. To activate it:
+
+1. Go to **scrapingant.com** → sign up for the free plan (10,000 credits/month).
+2. Copy your API key.
+3. Go to **Vercel** → your project → **Settings → Environment Variables**.
+4. Add: `SCRAPINGANT_API_KEY` = `your_key_here`
+5. Click **Redeploy** (top of Deployments tab).
+
+Once deployed, each part card shows a refresh button (↻). Click it to fetch
+the current price from Amazon India. Prices are labeled "checked [date]".
+Never say "live" or "updated daily" — ScrapingAnt credits are limited.
+
+**Cost**: each price check uses 10 credits. Free plan = 1,000 checks/month.
+
+## Updating parts data
+
+Edit the JS files in `data/`. Each object in the array is one part.
+Set `image: "https://..."` when you have an image URL.
+Set `cardLength`, `slotWidth`, `powerConnector` on GPUs for the
+compatibility engine (case/GPU length warning).
+
+## Compatibility rules implemented
+
+- AM5 CPU + DDR4 RAM → error warning
+- CPU memorySupport does not include chosen RAM type → error warning
+- High power draw (>850 W estimated) → caution warning
+
+More rules to add later:
+- GPU card length vs case max GPU length
+- Cooler height vs case max CPU cooler height
+- Motherboard socket vs CPU socket (needs motherboard data)
+- Motherboard form factor vs case (needs case data)
+
+## Amazon cart import
+
+The "Import to Amazon Cart" button builds this URL:
+```
+https://www.amazon.in/gp/aws/cart/add.html?AssociateTag=buildurpc-21&ASIN.1=B0...&Quantity.1=1&...
+```
+This is the standard Amazon multi-item cart URL.
+- `AssociateTag` is optional but recommended. Set it to your Amazon Associates tag
+  in `index.html` (search `buildurpc-21`) to earn referral fees.
+- Items without an ASIN are automatically skipped.
+
+## SSD ASINs
+
+All SSD ASINs in `data/ssds.js` are currently **blank** because the original
+spreadsheet had a placeholder ASIN for all 21 items. You must fill in the real
+ones. For each SSD:
+1. Search: `amazon.in/s?k=Samsung+990+PRO+1TB` (adjust name/capacity).
+2. Click the exact product page.
+3. Copy the 10-character ASIN from the URL (`/dp/XXXXXXXXXX`).
+4. Paste it into `data/ssds.js` for that item's `asin:` field.
+
+## ASINs
+
+All GPU ASINs are **Unverified**. CPU and RAM ASINs are from your sheets.
+Before launch, open each `amazon.in/dp/<ASIN>` and confirm exact model.
