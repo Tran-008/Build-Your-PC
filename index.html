@@ -714,15 +714,15 @@ function statusText(item) {
   const s = state.status[item.asin];
   const p = state.prices[item.asin];
   if (s === 'loading') return { err: false, txt: '<span class="spin"></span>Checking Amazon…' };
-  if (s === 'nokey') return { err: true, txt: 'Price service not set up on the server yet' };
+  if (s === 'nokey') return { err: true, txt: 'Price service not set up — add ZENROWS_API_KEY on Vercel' };
   if (s === 'local') return { err: true, txt: 'Prices only work on the deployed site' };
   if (s === 'unavail') return { err: true, txt: 'Currently unavailable on Amazon' };
   if (s === 'notfound') return { err: true, txt: 'Price not found on page — try again' };
   if (s && s.startsWith('upstream:')) {
     const code = s.split(':')[1];
-    const hint = (code === '401' || code === '403') ? 'API key rejected — paste the real ScrapingAnt token on Vercel and redeploy'
-               : code === '429' ? 'ScrapingAnt credits used up or rate-limited'
-               : 'ScrapingAnt error ' + code;
+    const hint = (code === '401' || code === '403') ? 'API key rejected — check ZENROWS_API_KEY on Vercel and redeploy'
+               : code === '429' ? 'ZenRows credits used up or rate-limited'
+               : 'Price provider error ' + code;
     return { err: true, txt: hint };
   }
   if (s === 'error') return { err: true, txt: 'Check failed — tap ↻ to retry' };
@@ -938,7 +938,7 @@ function renderSummary() {
   const hasAnyAsin = items.some(x => validAsin(x.item.asin));
   const anyNoKey = Object.values(state.status).includes('nokey');
   $('priceHint').textContent = !items.length ? '' :
-    anyNoKey ? 'Price checks are off on this deploy. The site owner needs to add SCRAPINGANT_API_KEY in Vercel and redeploy.' :
+    anyNoKey ? 'Price checks are off on this deploy. Add ZENROWS_API_KEY in Vercel and redeploy.' :
     !hasAnyAsin ? 'None of your parts have an Amazon ASIN yet, so prices and cart import are unavailable.' :
     'Tap ↻ PRICE on any part, or refresh every price from the cart.';
 

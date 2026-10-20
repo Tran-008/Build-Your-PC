@@ -14,7 +14,7 @@ web/
     ram.js          ← 21 RAM kits (DDR4 + DDR5)
     ssds.js         ← 21 SSDs (Samsung, WD, Crucial, Kingston) — ASINs need filling
   api/
-    price.js        ← Vercel serverless function; calls ScrapingAnt to get live price
+    price.js        ← Vercel serverless function; calls ZenRows to get live price
 ```
 
 ## Run locally
@@ -35,14 +35,13 @@ npx serve .
 5. Deploy. Vercel gives you a free `.vercel.app` domain.
 6. Later: add your Hostinger domain in Vercel's domain settings and update DNS.
 
-## Prices (ScrapingAnt)
+## Prices (ZenRows)
 
 Price fetching is wired up. To activate it:
 
-1. Go to **scrapingant.com** → sign up for the free plan (10,000 credits/month).
-2. Copy your API key.
+1. Go to **zenrows.com** → sign up and copy your API key from the dashboard.
 3. Go to **Vercel** → your project → **Settings → Environment Variables**.
-4. Add: `SCRAPINGANT_API_KEY` = `your_key_here`
+4. Add: `ZENROWS_API_KEY` = `your_key_here` (Production)
 5. Click **Redeploy** (top of Deployments tab).
 
 Once deployed, every part (CPU, GPU, RAM, SSD) has a **↻ PRICE** button, and the
@@ -50,7 +49,7 @@ cart has **↻ REFRESH ALL PRICES**. Prices are fetched only when you ask and ar
 labeled "checked [date]". Never say "live" or "updated daily" — credits are limited.
 
 Status messages tell you what is wrong:
-- "Price service not set up on the server yet" → `SCRAPINGANT_API_KEY` is missing in Vercel (or you did not redeploy).
+- "Price service not set up" → `ZENROWS_API_KEY` is missing in Vercel (or you did not redeploy).
 - "Prices only work on the deployed site" → you opened `index.html` straight from disk; `/api` only exists on Vercel.
 - "No Amazon ASIN yet" → fill in that part's `asin` in `data/*.js`.
 
