@@ -45,9 +45,14 @@ Price fetching is wired up. To activate it:
 4. Add: `SCRAPINGANT_API_KEY` = `your_key_here`
 5. Click **Redeploy** (top of Deployments tab).
 
-Once deployed, each part card shows a refresh button (↻). Click it to fetch
-the current price from Amazon India. Prices are labeled "checked [date]".
-Never say "live" or "updated daily" — ScrapingAnt credits are limited.
+Once deployed, every part (CPU, GPU, RAM, SSD) has a **↻ PRICE** button, and the
+cart has **↻ REFRESH ALL PRICES**. Prices are fetched only when you ask and are
+labeled "checked [date]". Never say "live" or "updated daily" — credits are limited.
+
+Status messages tell you what is wrong:
+- "Price service not set up on the server yet" → `SCRAPINGANT_API_KEY` is missing in Vercel (or you did not redeploy).
+- "Prices only work on the deployed site" → you opened `index.html` straight from disk; `/api` only exists on Vercel.
+- "No Amazon ASIN yet" → fill in that part's `asin` in `data/*.js`.
 
 **Cost**: each price check uses 10 credits. Free plan = 1,000 checks/month.
 
