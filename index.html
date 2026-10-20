@@ -672,18 +672,38 @@ function priceOf(item) {
 /* =====================================================
    PRICE FETCHING (every category)
 ===================================================== */
-async function fetchPrice(asin) {
+// Load every saved price from the shared database (no ZenRows credits used)
+async function loadSynced() {
+  try {
+    const res = await fetch('/api/prices', { cache: 'no-store' });
+    if (!res.ok) return;
+    const data = await res.json();
+    Object.assign(state.prices, data.prices || {});
+    savePrices();
+    renderAll();
+  } catch {}
+}
+
+// refresh=true asks the server to call ZenRows; otherwise it returns the saved price
+async function fetchPrice(asin, refresh = true) {
   if (!validAsin(asin)) return;
   state.status[asin] = 'loading';
   renderAll();
   try {
-    const res = await fetch(PRICE_ENDPOINT + encodeURIComponent(asin), { cache: 'no-store' });
+    const url = PRICE_ENDPOINT + encodeURIComponent(asin) + (refresh ? '&refresh=1' : '');
+    const res = await fetch(url, { cache: 'no-store' });
     let data = {};
     try { data = await res.json(); } catch {}
     if (data.price) {
       state.prices[asin] = { price: data.price, checkedAt: data.checkedAt || new Date().toISOString() };
       savePrices();
-      state.status[asin] = 'ok';
+      state.status[asin] = data.cooldown ? 'cooldown' : 'ok';
+    } else if (data.unavailable) {
+      state.prices[asin] = { unavailable: true, checkedAt: data.checkedAt };
+      savePrices();
+      state.status[asin] = 'unavail';
+    } else if (res.status === 429) {
+      state.status[asin] = 'cooldown';
     } else if (res.status === 404) {
       state.status[asin] = 'local';          // opened without the Vercel /api route
     } else if (res.status === 503) {
@@ -706,7 +726,7 @@ async function fetchPrice(asin) {
 function refreshBuildPrices() {
   const asins = CAT_ORDER.map(c => state.build[c]?.item).filter(Boolean).map(i => i.asin).filter(validAsin);
   if (!asins.length) return toast('Add parts with an ASIN first');
-  asins.forEach(fetchPrice);
+  asins.forEach(a => fetchPrice(a, true));
 }
 
 function statusText(item) {
@@ -717,6 +737,7 @@ function statusText(item) {
   if (s === 'nokey') return { err: true, txt: 'Price service not set up — add ZENROWS_API_KEY on Vercel' };
   if (s === 'local') return { err: true, txt: 'Prices only work on the deployed site' };
   if (s === 'unavail') return { err: true, txt: 'Currently unavailable on Amazon' };
+  if (s === 'cooldown') return { err: false, txt: 'Checked recently — refresh again in a few minutes' };
   if (s === 'notfound') return { err: true, txt: 'Price not found on page — try again' };
   if (s && s.startsWith('upstream:')) {
     const code = s.split(':')[1];
@@ -726,7 +747,8 @@ function statusText(item) {
     return { err: true, txt: hint };
   }
   if (s === 'error') return { err: true, txt: 'Check failed — tap ↻ to retry' };
-  if (p) return { err: false, txt: 'checked ' + timeStr(p.checkedAt) };
+  if (p && p.unavailable) return { err: true, txt: 'Currently unavailable on Amazon (checked ' + timeStr(p.checkedAt) + ')' };
+  if (p) return { err: false, txt: 'synced · checked ' + timeStr(p.checkedAt) };
   return { err: false, txt: 'Not checked yet — tap ↻ PRICE' };
 }
 
@@ -1115,7 +1137,7 @@ document.addEventListener('click', e => {
     case 'compare':      toggleCompare(el.dataset.cat, el.dataset.id); break;
     case 'uncompare':    state.compare.splice(+el.dataset.i, 1); renderAll(); break;
     case 'clearCompare': state.compare = []; renderAll(); break;
-    case 'price':        fetchPrice(el.dataset.asin); break;
+    case 'price':        fetchPrice(el.dataset.asin, true); break;
     case 'refreshAll':   refreshBuildPrices(); break;
     case 'remove':       removeFromBuild(el.dataset.cat); break;
     case 'qty':          changeQty(el.dataset.cat, +el.dataset.d); break;
@@ -1133,6 +1155,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCart();
 ===================================================== */
 buildTicker();
 renderAll();
+loadSynced();
 </script>
 </body>
 </html>

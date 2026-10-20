@@ -14,7 +14,10 @@ web/
     ram.js          ← 21 RAM kits (DDR4 + DDR5)
     ssds.js         ← 21 SSDs (Samsung, WD, Crucial, Kingston) — ASINs need filling
   api/
-    price.js        ← Vercel serverless function; calls ZenRows to get live price
+    price.js        ← Vercel function: saved price, or fresh ZenRows check when refreshed
+    prices.js       ← Vercel function: all saved prices (loaded on every visit)
+  lib/
+    store.js        ← shared price database (Upstash Redis, free tier)
 ```
 
 ## Run locally
@@ -99,3 +102,21 @@ ones. For each SSD:
 
 All GPU ASINs are **Unverified**. CPU and RAM ASINs are from your sheets.
 Before launch, open each `amazon.in/dp/<ASIN>` and confirm exact model.
+
+## Shared price database (saves ZenRows credits)
+
+Prices are saved in Upstash Redis, so every device and browser shows the same
+numbers without fetching again.
+
+1. Vercel → build-ur-pc → **Storage** → **Create** → **Upstash Redis** (free plan).
+   Connect it to this project. Vercel adds the `UPSTASH_REDIS_REST_URL` and
+   `UPSTASH_REDIS_REST_TOKEN` variables for you.
+2. Redeploy Production.
+3. Click ↻ PRICE once. From then on, every device loads saved prices instantly.
+
+How it works:
+- Opening the site reads saved prices only. No ZenRows credits are used.
+- ↻ PRICE and ↻ REFRESH ALL PRICES fetch a new price from ZenRows.
+- Each product can be fetched at most once every 10 minutes, so repeated clicks
+  cannot burn credits.
+- Without the database the site still works, but nothing is saved between devices.
