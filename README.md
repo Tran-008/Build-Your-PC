@@ -17,7 +17,8 @@ web/
     price.js        ← Vercel function: saved price, or fresh ZenRows check when refreshed
     prices.js       ← Vercel function: all saved prices (loaded on every visit)
   lib/
-    store.js        ← shared price database (Upstash Redis, free tier)
+    store.js        ← shared price database (Redis, via REDIS_URL)
+package.json        ← lists the `redis` package; Vercel installs it on deploy
 ```
 
 ## Run locally
@@ -105,12 +106,11 @@ Before launch, open each `amazon.in/dp/<ASIN>` and confirm exact model.
 
 ## Shared price database (saves ZenRows credits)
 
-Prices are saved in Upstash Redis, so every device and browser shows the same
+Prices are saved in a Redis database, so every device and browser shows the same
 numbers without fetching again.
 
-1. Vercel → build-ur-pc → **Storage** → **Create** → **Upstash Redis** (free plan).
-   Connect it to this project. Vercel adds the `UPSTASH_REDIS_REST_URL` and
-   `UPSTASH_REDIS_REST_TOKEN` variables for you.
+1. Vercel → build-ur-pc → **Storage** → add a **Redis** database and connect it to
+   this project. Vercel adds `REDIS_URL` for you. Use the free plan if offered.
 2. Redeploy Production.
 3. Click ↻ PRICE once. From then on, every device loads saved prices instantly.
 
